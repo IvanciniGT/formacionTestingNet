@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.9" />
+    <PackageReference Include="NSwag.AspNetCore" Version="14.6.3" />
+    <PackageReference Include="Scrutor" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../Rest/V1/Api/Rest.V1.Api.csproj" />
+    <ProjectReference Include="../../Rest/V1/Impl/Rest.V1.Impl.csproj" />
+    <ProjectReference Include="../../Servicio/Api/Servicio.Api.csproj" />
+    <ProjectReference Include="../../Servicio/Impl/Servicio.Impl.csproj" />
+    <ProjectReference Include="../../Diccionarios/BBDD/Diccionarios.BBDD.csproj" />
+  </ItemGroup>
+
+</Project>
