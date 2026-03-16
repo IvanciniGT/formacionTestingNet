@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="AppConsola/AppConsola.csproj" />
+  <Project Path="LibreriaMatematica.Test/LibreriaMatematica.Test.csproj" />
+  <Project Path="LibreriaMatematica/LibreriaMatematica.csproj" />
+</Solution>
