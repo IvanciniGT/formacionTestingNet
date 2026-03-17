@@ -1,18 +1,33 @@
 ﻿namespace LibreriaMatematica2.Test;
 using LibreriaMatematica;
+using AppConsola;
+using Microsoft.Extensions.Hosting;
+using Moq;
 
 public class LogicaDelProgramaTest
 {
-    private LogicaDelPrograma logicaDelPrograma;
+    private LogicaDelPrograma logicaDelProgramaSistema;
+    private LogicaDelPrograma logicaDelProgramaAislada;
+    private Mock<ILibreriaMatematica> mockMatematica;
+    private Mock<IHostApplicationLifetime> mockLifetime;
 
     // Ahora vamos con XUnit... Cambia un poco la sintaxis.. pero los conceptos NADA!
 
     public LogicaDelProgramaTest()
     {
+        // Mock del IHostApplicationLifetime (necesario para LogicaDelPrograma)
+        mockLifetime = new Mock<IHostApplicationLifetime>();
+        
         LibreriaMatematica libreriaAUsar = new LibreriaMatematica();
-        logicaDelProgramaSistema = new LogicaDelPrograma(libreriaAUsar);
+        logicaDelProgramaSistema = new LogicaDelPrograma(libreriaAUsar, mockLifetime.Object);
 
-        logicaDelProgramaAislada = new LogicaDelPrograma(new LibreriaMatematicaStub());
+        // En lugar de un cutrestub manual, usamos Moq!
+        // Mock es un objeto que simula el comportamiento de otro objeto.
+        mockMatematica = new Mock<ILibreriaMatematica>(); // En realidad lo que me crea es un dummy
+        
+        
+        // .Object nos da la instancia que implementa ILibreriaMatematica
+        logicaDelProgramaAislada = new LogicaDelPrograma(mockMatematica.Object, mockLifetime.Object);
     }
 
     [Fact] 
@@ -32,7 +47,7 @@ public class LogicaDelProgramaTest
         //Assert.Pass(); // La prueba pasa sin problemas.
         // DADO: GIVEN: CONTEXTO: En qué condiciones se va a ejecutar la función de prueba.
         // ACCION: WHEN: CUANDO: Qué función se va a ejecutar en la función de prueba.
-        logicaDelPrograma.ejecutar();
+        logicaDelProgramaSistema.ejecutar();
         // COMPROBACION: THEN: ENTONCES: Qué resultado se espera de la función de prueba.
         var resultado = sw.ToString().Trim();
         // Asegurate que contiene el mensaje de bienvenida, el mensaje de despedida, y el mensaje de error por no ingresar números válidos.
@@ -45,11 +60,16 @@ public class LogicaDelProgramaTest
     }
     // Pero esto es una prueba de Sistema y en este caso igual a la de intengración.
     [Fact] 
-    public void VerSiElProgramaFunciona()
+    public void VerSiElProgramaFuncionaAislada()
     {
 
         // Dado que el programa interactua con la consola... Le pego unn cambiazo a la consola.
         //  Cambio el STDIN, para simular la entrada del usuario, y el STDOUT, para capturar la salida del programa, y luego poder hacer aserciones sobre esa salida.
+        // Configuramos el comportamiento del mock:
+        // "Cuando llamen a Sumar con cualquier int, devuelve 33"
+        mockMatematica.Setup(m => m.Sumar(It.IsAny<int>(), It.IsAny<int>())).Returns(33);
+        // "Cuando llamen a Restar con cualquier int, devuelve 11"
+        mockMatematica.Setup(m => m.Restar(It.IsAny<int>(), It.IsAny<int>())).Returns(11);
 
         // Hago que el STDOut sea un StringWriter, para capturar la salida del programa.
         using var sw = new StringWriter();
@@ -71,6 +91,9 @@ public class LogicaDelProgramaTest
         Assert.Contains("Ingrese el segundo número:", resultado);
         Assert.Contains("La suma de 50 y 70 es: 33", resultado);
         Assert.Contains("La resta de 50 y 70 es: 11", resultado);
+        // ME aseguro que el mock se haya llamado con los números que le pasé al programa.
+        mockMatematica.Verify(m => m.Sumar(50, 70), Times.Once);
+        mockMatematica.Verify(m => m.Restar(50, 70), Times.Once);
     }
     // Prueba unitaria.
 }
