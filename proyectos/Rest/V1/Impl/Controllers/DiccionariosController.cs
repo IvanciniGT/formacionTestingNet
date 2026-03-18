@@ -19,10 +19,26 @@ public class DiccionariosController : ControllerBase
     private readonly IMapper _mapper;
     private readonly ILogger<DiccionariosController> _logger;
 
-    public DiccionariosController(
-        IServicio servicioDiccionarios,
-        IMapper mapper,
-        ILogger<DiccionariosController> logger)
+    public DiccionariosController(                  // Unitaria
+        IServicio servicioDiccionarios,         // Mock? SI: No se ni si está acabado! Y si lo está no me fio de él.. no es mio.
+        IMapper mapper,                         // Mock? NO: REAL (con sus pruebas unitarias propias)
+        ILogger<DiccionariosController> logger) // Mock? NO: Fake: Logger a consola
+                                                    // Integración:
+                                                // Igual pero con el Servicio real.
+                                                        // Tanto en unas como en otras:
+                                                        // Qué tipo de cosas pongo en el When: Cuando: Acción:
+
+                                                        // Dado que tengo un servicio que no tiene el idioma de los elfos
+                                                        // Cuando le piedo al controlador el diccionario de los elfos
+                                                        //        ActionResult<DiccionarioRestV1DTO> respuesta= controlador.GetDiccionario("ELF");
+                                                        // Entonces me tiene que devolver un 404 Not Found
+                                                        //        Assert.IsType<NotFoundObjectResult>(respuesta.Result);
+                                                    // Sistema: SI
+                                                        // Dado que tengo un servicio que no tiene el idioma de los elfos
+                                                        // Cuando hago una petición http al endpoint /api/v1/diccionarios/ELF con método get
+                                                        //        var response = await client.GetAsync("/api/v1/diccionarios/ELF");
+                                                        // Entonces me tiene que devolver un http response con status 404 Not Found
+                                                        //        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     {
         _servicioDiccionarios = servicioDiccionarios;
         _mapper = mapper;

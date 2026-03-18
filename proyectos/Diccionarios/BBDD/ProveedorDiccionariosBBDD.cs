@@ -188,3 +188,17 @@ public class ProveedorDiccionariosBBDD : IProveedorDiccionarios
         return idiomas;
     }
 }
+    // Ir al contexto de BBDD y obtener los idiomas disponibles: List<IdiomaEntity>
+    // Convertir cada IdiomaEntity en un IdiomaBBDD (que implementa IIdioma) mapeo de Entidad al DTO
+    // Esta función, ya que recibe un logger.. quiero que haga loging de cosas?
+        // Qué debería logear?
+        // - Si no hay idiomas, logear un warning
+        // - Cuántos idiomas se han encontrado y se van a retornar, logear un info
+    // Retornar la lista de IIdioma al consumidor
+
+
+    // COPILOT (chatbot) --Contexto -> LLM (IA)
+    //                   --Prompt --->
+    // Ficheros en el proyecto:
+    //. - Arquitectura
+    //. - Decisiones de implementación de test
