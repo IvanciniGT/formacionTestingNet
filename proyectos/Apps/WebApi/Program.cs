@@ -60,8 +60,9 @@ builder.Services.Decorate<IServicio, ServicioLoggingDecorator>();
 // -----------------------------------------------------------------------------
 // AUTOMAPPER: Perfiles de mapeo
 // -----------------------------------------------------------------------------
-builder.Services.AddAutoMapper(typeof(ServicioDiccionarios.Implementacion.Mappers.DiccionariosMapperProfile));
-builder.Services.AddAutoMapper(typeof(RestV1MapperProfile));
+builder.Services.AddAutoMapper(
+    typeof(ServicioDiccionarios.Implementacion.Mappers.DiccionariosMapperProfile),
+    typeof(RestV1MapperProfile));
 
 var app = builder.Build();
 
@@ -78,3 +79,7 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
+
+// Necesario para que WebApplicationFactory<Program> pueda acceder a la clase Program
+// desde los proyectos de pruebas de sistema.
+public partial class Program { }

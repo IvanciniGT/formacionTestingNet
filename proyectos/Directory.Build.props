@@ -1,0 +1,19 @@
+<!--
+  Directory.Build.props: Propiedades compartidas por TODOS los proyectos de la solución.
+  Se aplica automáticamente a todos los .csproj sin necesidad de importarlo explícitamente.
+  
+  Referencia: https://learn.microsoft.com/dotnet/core/project-sdk/msbuild-defaults#directorybuildprops
+-->
+<Project>
+  <PropertyGroup>
+    <!--
+      Suprimir NU1903 para AutoMapper: la vulnerabilidad GHSA-rvv3-g6hj-g44x afecta a TODAS las versiones
+      de AutoMapper por diseño (permite instanciación de tipos durante el mapeo).
+      El mantenedor (Jimmy Bogard) lo considera funcionalidad, no un bug.
+      Ver: https://github.com/AutoMapper/AutoMapper/issues/4231
+      
+      Mitigación: no se usa ConvertUsing con tipos controlados por el usuario.
+    -->
+    <NoWarn>$(NoWarn);NU1903</NoWarn>
+  </PropertyGroup>
+</Project>

@@ -12,7 +12,7 @@ namespace Diccionarios.BBDD.Tests;
 /// Pruebas TDD para ProveedorDiccionariosBBDD
 /// ESTAS PRUEBAS VAN A FALLAR INICIALMENTE - ¡ES LO ESPERADO EN TDD! 🔴
 /// </summary>
-public class ProveedorDiccionariosTestsBase
+public abstract class ProveedorDiccionariosTestsBase
 {
     protected IProveedorDiccionarios _suministrador { get; set; }
 

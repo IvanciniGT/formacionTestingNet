@@ -1,0 +1,30 @@
+@model BusquedaViewModel
+
+@{
+    ViewData["Title"] = "Buscar en " + Model.NombreDiccionario;
+}
+
+<h1>@Model.NombreDiccionario</h1>
+<p><a href="javascript:history.back()">&larr; Volver</a></p>
+
+<form method="get" action="/Diccionarios/Buscar">
+    <input type="hidden" name="codigoDiccionario" value="@Model.CodigoDiccionario" />
+    <input type="text" name="palabra" value="@Model.Palabra" placeholder="Escribe una palabra..." />
+    <button type="submit" class="btn">Buscar</button>
+</form>
+
+@if (Model.SinResultados)
+{
+    <div class="alert alert-warning">
+        No se encontraron significados para &laquo;@Model.Palabra&raquo;.
+    </div>
+}
+
+@if (Model.Significados.Any())
+{
+    <h2>Significados de &laquo;@Model.Palabra&raquo;</h2>
+    @foreach (var sig in Model.Significados)
+    {
+        <div class="significado">@sig</div>
+    }
+}

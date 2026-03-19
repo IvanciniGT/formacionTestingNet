@@ -1,0 +1,25 @@
+services:
+  app:
+    image: mcr.microsoft.com/dotnet/sdk:10.0
+    volumes:
+      - ..:/workspace:cached
+    command: sleep infinity
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    environment:
+      - MARIADB_CONNECTION_STRING=Server=mariadb;Port=3306;Database=diccionarios_test;User=root;Password=test1234;
+
+  mariadb:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: test1234
+      MYSQL_DATABASE: diccionarios_test
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 10

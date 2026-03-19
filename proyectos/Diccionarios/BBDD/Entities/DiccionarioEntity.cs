@@ -1,5 +1,9 @@
 namespace Diccionarios.BBDD.Entities;
 
+/// <summary>
+/// Entidad EF Core que representa un diccionario (ej: RAE, Oxford).
+/// Pertenece a un idioma y contiene múltiples palabras (relación 1:N).
+/// </summary>
 public class DiccionarioEntity
 {
     public int Id { get; set; }

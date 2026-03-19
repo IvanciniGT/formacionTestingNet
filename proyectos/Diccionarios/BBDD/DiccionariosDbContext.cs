@@ -3,6 +3,11 @@ using Diccionarios.BBDD.Entities;
 
 namespace Diccionarios.BBDD;
 
+/// <summary>
+/// Contexto de Entity Framework Core para el dominio de diccionarios.
+/// Define las tablas (DbSet), las relaciones entre entidades (OnModelCreating)
+/// y los índices funcionales para búsquedas case-insensitive.
+/// </summary>
 public class DiccionariosDbContext : DbContext
 {
     public DbSet<IdiomaEntity> Idiomas { get; set; }

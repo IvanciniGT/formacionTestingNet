@@ -3,6 +3,11 @@ using UI.Api;
 
 namespace DiccionariosAppHost;
 
+/// <summary>
+/// Orquestador principal de la aplicación de consola.
+/// Coordina la interacción entre la UI (IUIApp) y la capa de datos (IProveedorDiccionarios)
+/// para buscar palabras en diccionarios del idioma especificado.
+/// </summary>
 public class Aplicacion
 {
     private readonly IProveedorDiccionarios _suministradorDeDiccionarios;
@@ -14,6 +19,11 @@ public class Aplicacion
         _ui = ui;
     }
 
+    /// <summary>
+    /// Ejecuta el flujo principal: valida argumentos, busca la palabra y muestra resultados.
+    /// </summary>
+    /// <param name="args">args[0] = código de idioma (ej: "ES"), args[1] = palabra a buscar</param>
+    /// <returns>0 si la operación fue exitosa, 1 si hubo algún error</returns>
     public async Task<int> EjecutarAsync(string[] args)
     {
         _ui.MostrarMensajeBienvenida();

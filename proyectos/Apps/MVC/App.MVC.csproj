@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.14" />
+    <PackageReference Include="Scrutor" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../Servicio/Api/Servicio.Api.csproj" />
+    <ProjectReference Include="../../Servicio/Impl/Servicio.Impl.csproj" />
+    <ProjectReference Include="../../Diccionarios/BBDD/Diccionarios.BBDD.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -186,6 +186,151 @@ public class ServicioImplTests
         Assert.Contains(resultado, s => s.Diccionario == "ES_LAROUSSE" && s.Texto == "Hogar familiar");
     }
 
+    // =========================================================================
+    // Tests adicionales: entradas nulas/vacías y casos borde
+    // =========================================================================
+
+    [Fact]
+    public void GetDiccionario_ConCodigoNull_DeberiaRetornarNull()
+    {
+        var resultado = _servicio.GetDiccionario(null!);
+        Assert.Null(resultado);
+    }
+
+    [Fact]
+    public void GetDiccionario_ConCodigoVacio_DeberiaRetornarNull()
+    {
+        var resultado = _servicio.GetDiccionario("  ");
+        Assert.Null(resultado);
+    }
+
+    [Fact]
+    public void GetDiccionario_ConCodigoInexistente_DeberiaRetornarNull()
+    {
+        _mockSuministrador.Setup(x => x.GetDiccionarioPorCodigo("ELF")).Returns((IDiccionario?)null);
+        var resultado = _servicio.GetDiccionario("ELF");
+        Assert.Null(resultado);
+    }
+
+    [Fact]
+    public void GetDiccionarios_ConIdiomaVacio_DeberiaRetornarNull()
+    {
+        var resultado = _servicio.GetDiccionarios("  ");
+        Assert.Null(resultado);
+    }
+
+    [Fact]
+    public void GetSignificadosEnDiccionario_ConPalabraVacia_DeberiaRetornarNull()
+    {
+        var resultado = _servicio.GetSignificadosEnDiccionario("ES_RAE", "  ");
+        Assert.Null(resultado);
+    }
+
+    [Fact]
+    public void GetSignificadosEnDiccionario_DiccionarioNoExiste_DeberiaRetornarNull()
+    {
+        _mockSuministrador.Setup(x => x.GetDiccionarioPorCodigo("ELF")).Returns((IDiccionario?)null);
+        var resultado = _servicio.GetSignificadosEnDiccionario("ELF", "casa");
+        Assert.Null(resultado);
+    }
+
+    [Fact]
+    public void GetSignificadosEnDiccionario_PalabraNoExiste_DeberiaRetornarNull()
+    {
+        var mockDiccionario = CreateMockDiccionario("ES_RAE", "ES");
+        mockDiccionario.Setup(x => x.GetSignificados("zzz")).Returns((IList<string>?)null);
+        _mockSuministrador.Setup(x => x.GetDiccionarioPorCodigo("ES_RAE")).Returns(mockDiccionario.Object);
+
+        var resultado = _servicio.GetSignificadosEnDiccionario("ES_RAE", "zzz");
+        Assert.Null(resultado);
+    }
+
+    [Fact]
+    public void GetSignificadosEnIdioma_ConPalabraVacia_DeberiaRetornarNull()
+    {
+        var resultado = _servicio.GetSignificadosEnIdioma("ES", "  ");
+        Assert.Null(resultado);
+    }
+
+    [Fact]
+    public void GetSignificadosEnIdioma_IdiomaNoExiste_DeberiaRetornarNull()
+    {
+        _mockSuministrador.Setup(x => x.GetDiccionarios("ELF")).Returns((IList<IDiccionario>?)null);
+        var resultado = _servicio.GetSignificadosEnIdioma("ELF", "casa");
+        Assert.Null(resultado);
+    }
+
+    [Fact]
+    public void GetSignificadosEnIdioma_PalabraNoExisteEnNingunDiccionario_DeberiaRetornarNull()
+    {
+        var mockDic1 = CreateMockDiccionario("ES_RAE", "ES");
+        var mockDic2 = CreateMockDiccionario("ES_LAROUSSE", "ES");
+        mockDic1.Setup(x => x.GetSignificados("zzz")).Returns((IList<string>?)null);
+        mockDic2.Setup(x => x.GetSignificados("zzz")).Returns((IList<string>?)null);
+
+        _mockSuministrador.Setup(x => x.GetDiccionarios("ES"))
+            .Returns(new List<IDiccionario> { mockDic1.Object, mockDic2.Object });
+
+        var resultado = _servicio.GetSignificadosEnIdioma("ES", "zzz");
+        Assert.Null(resultado);
+    }
+
+    [Fact]
+    public void ExistePalabraEnDiccionario_PalabraNoExiste_DeberiaRetornarFalse()
+    {
+        var mockDiccionario = CreateMockDiccionario("ES_RAE", "ES");
+        mockDiccionario.Setup(x => x.Existe("zzz")).Returns(false);
+        _mockSuministrador.Setup(x => x.GetDiccionarioPorCodigo("ES_RAE")).Returns(mockDiccionario.Object);
+
+        var resultado = _servicio.ExistePalabraEnDiccionario("ES_RAE", "zzz");
+        Assert.False(resultado);
+    }
+
+    [Fact]
+    public void ExistePalabraEnDiccionario_DiccionarioNoExiste_DeberiaRetornarFalse()
+    {
+        _mockSuministrador.Setup(x => x.GetDiccionarioPorCodigo("ELF")).Returns((IDiccionario?)null);
+        var resultado = _servicio.ExistePalabraEnDiccionario("ELF", "casa");
+        Assert.False(resultado);
+    }
+
+    [Fact]
+    public void ExistePalabraEnDiccionario_ConParametrosVacios_DeberiaRetornarFalse()
+    {
+        Assert.False(_servicio.ExistePalabraEnDiccionario("  ", "casa"));
+        Assert.False(_servicio.ExistePalabraEnDiccionario("ES_RAE", "  "));
+    }
+
+    [Fact]
+    public void ExistePalabraEnIdioma_PalabraNoExisteEnNinguno_DeberiaRetornarFalse()
+    {
+        var mockDic1 = CreateMockDiccionario("ES_RAE", "ES");
+        var mockDic2 = CreateMockDiccionario("ES_LAROUSSE", "ES");
+        mockDic1.Setup(x => x.Existe("zzz")).Returns(false);
+        mockDic2.Setup(x => x.Existe("zzz")).Returns(false);
+
+        _mockSuministrador.Setup(x => x.GetDiccionarios("ES"))
+            .Returns(new List<IDiccionario> { mockDic1.Object, mockDic2.Object });
+
+        var resultado = _servicio.ExistePalabraEnIdioma("ES", "zzz");
+        Assert.False(resultado);
+    }
+
+    [Fact]
+    public void ExistePalabraEnIdioma_IdiomaNoExiste_DeberiaRetornarFalse()
+    {
+        _mockSuministrador.Setup(x => x.GetDiccionarios("ELF")).Returns((IList<IDiccionario>?)null);
+        var resultado = _servicio.ExistePalabraEnIdioma("ELF", "casa");
+        Assert.False(resultado);
+    }
+
+    [Fact]
+    public void ExistePalabraEnIdioma_ConParametrosVacios_DeberiaRetornarFalse()
+    {
+        Assert.False(_servicio.ExistePalabraEnIdioma("  ", "casa"));
+        Assert.False(_servicio.ExistePalabraEnIdioma("ES", "  "));
+    }
+
     private static IIdioma CreateMockIdioma(string codigo, string nombre)
     {
         var mock = new Mock<IIdioma>();

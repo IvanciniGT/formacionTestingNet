@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -10,7 +10,7 @@
 
   <ItemGroup> <!-- Esto es solo una declaración de las dependencias -->
     <PackageReference Include="coverlet.collector" Version="6.0.4" />       <!-- cobertura de código -->
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" /> <!-- ejecutar dotnet test   -->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" /> <!-- ejecutar dotnet test   -->
     <PackageReference Include="NUnit" Version="4.3.2" />                    <!-- framework de pruebas -->
     <PackageReference Include="NUnit.Analyzers" Version="4.7.0" />          <!-- Revisar las pruebas en tiempo de ejecución -->
     <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />        <!-- adaptador de NUnit para Visual Studio -->

@@ -1,0 +1,16 @@
+{
+    "name": "DiccionariosApp - .NET + MariaDB",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "app",
+    "workspaceFolder": "/workspace",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-dotnettools.csharp",
+                "ms-dotnettools.csdevkit"
+            ]
+        }
+    },
+    "forwardPorts": [5000, 3306],
+    "postCreateCommand": "dotnet restore"
+}

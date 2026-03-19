@@ -1,5 +1,9 @@
 namespace Diccionarios.BBDD.Entities;
 
+/// <summary>
+/// Entidad EF Core que representa un idioma (ej: Español, Inglés).
+/// Un idioma tiene múltiples diccionarios asociados (relación 1:N).
+/// </summary>
 public class IdiomaEntity
 {
     public int Id { get; set; }

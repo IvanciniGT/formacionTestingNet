@@ -1,0 +1,22 @@
+@model List<IdiomaViewModel>
+
+@{
+    ViewData["Title"] = "Idiomas";
+}
+
+<h1>Idiomas disponibles</h1>
+<p>Selecciona un idioma para ver sus diccionarios:</p>
+
+@foreach (var idioma in Model)
+{
+    <div class="card">
+        <h2>@idioma.Nombre</h2>
+        <p>Código: <strong>@idioma.Codigo</strong></p>
+        <a class="btn" href="/Diccionarios?codigoIdioma=@idioma.Codigo">Ver diccionarios</a>
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-warning">No hay idiomas disponibles.</div>
+}

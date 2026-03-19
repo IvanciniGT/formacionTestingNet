@@ -1,5 +1,10 @@
 namespace Diccionarios.BBDD.Entities;
 
+/// <summary>
+/// Entidad EF Core que representa una palabra dentro de un diccionario.
+/// Contiene uno o más significados (relación 1:N con SignificadoEntity).
+/// Las búsquedas case-insensitive se optimizan con un índice funcional UPPER(Texto).
+/// </summary>
 public class PalabraEntity
 {
     public int Id { get; set; }
