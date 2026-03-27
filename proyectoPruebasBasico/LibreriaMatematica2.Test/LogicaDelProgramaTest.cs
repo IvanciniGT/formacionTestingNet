@@ -1,4 +1,8 @@
-﻿namespace LibreriaMatematica2.Test;
+﻿using Xunit;
+
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
+
+namespace LibreriaMatematica2.Test;
 using LibreriaMatematica;
 using AppConsola;
 using Microsoft.Extensions.Hosting;
@@ -6,124 +10,183 @@ using Moq;
 
 public class LogicaDelProgramaTest
 {
-    private LogicaDelPrograma logicaDelProgramaSistema;
-    private LogicaDelPrograma logicaDelProgramaAislada;
-    private Mock<ILibreriaMatematica> mockMatematica;
-    private Mock<IHostApplicationLifetime> mockLifetime;
-
-    // Ahora vamos con XUnit... Cambia un poco la sintaxis.. pero los conceptos NADA!
-
-    public LogicaDelProgramaTest()
+    [Fact]
+    public void Ejecutar_con_libreria_real_muestra_los_resultados_esperados()
     {
-        // Mock del IHostApplicationLifetime (necesario para LogicaDelPrograma)
-        mockLifetime = new Mock<IHostApplicationLifetime>();
-        
-        LibreriaMatematica libreriaAUsar = new LibreriaMatematica();
-        logicaDelProgramaSistema = new LogicaDelPrograma(libreriaAUsar, mockLifetime.Object);
+        var sut = CrearSut(new global::LibreriaMatematica.LibreriaMatematica(), out _);
 
-        // En lugar de un cutrestub manual, usamos Moq!
-        // Mock es un objeto que simula el comportamiento de otro objeto.
-        mockMatematica = new Mock<ILibreriaMatematica>(); // En realidad lo que me crea es un dummy
-        
-        
-        // .Object nos da la instancia que implementa ILibreriaMatematica
-        logicaDelProgramaAislada = new LogicaDelPrograma(mockMatematica.Object, mockLifetime.Object);
-    }
+        TextReader originalIn = Console.In;
+        TextWriter originalOut = Console.Out;
+        using var input = new StringReader("5" + Environment.NewLine + "10" + Environment.NewLine);
+        using var output = new StringWriter();
 
-    [Fact] 
-    public void VerSiElProgramaFunciona()
-    {
-
-        // Dado que el programa interactua con la consola... Le pego unn cambiazo a la consola.
-        //  Cambio el STDIN, para simular la entrada del usuario, y el STDOUT, para capturar la salida del programa, y luego poder hacer aserciones sobre esa salida.
-
-        // Hago que el STDOut sea un StringWriter, para capturar la salida del programa.
-        using var sw = new StringWriter();
-        Console.SetOut(sw);
-        // Para mandarle números al programa, hago que el STDIN sea un StringReader, y le paso los números que quiero que el programa lea, separados por un salto de línea.
-        using var sr = new StringReader("5\n10\n");
-        Console.SetIn(sr);
-
-        //Assert.Pass(); // La prueba pasa sin problemas.
-        // DADO: GIVEN: CONTEXTO: En qué condiciones se va a ejecutar la función de prueba.
-        // ACCION: WHEN: CUANDO: Qué función se va a ejecutar en la función de prueba.
-        logicaDelProgramaSistema.ejecutar();
-        // COMPROBACION: THEN: ENTONCES: Qué resultado se espera de la función de prueba.
-        var resultado = sw.ToString().Trim();
-        // Asegurate que contiene el mensaje de bienvenida, el mensaje de despedida, y el mensaje de error por no ingresar números válidos.
-        Assert.Contains("Hello, cuentecitas!", resultado);
-        Assert.Contains("¡Hasta luego, cuentecitas!", resultado);
-        Assert.Contains("Ingrese el primer número:", resultado);
-        Assert.Contains("Ingrese el segundo número:", resultado);
-        Assert.Contains("La suma de 5 y 10 es: 15", resultado);
-        Assert.Contains("La resta de 5 y 10 es: -5", resultado);
-    }
-    // Pero esto es una prueba de Sistema y en este caso igual a la de intengración.
-    [Fact] 
-    public void VerSiElProgramaFuncionaAislada()
-    {
-
-        // Dado que el programa interactua con la consola... Le pego unn cambiazo a la consola.
-        //  Cambio el STDIN, para simular la entrada del usuario, y el STDOUT, para capturar la salida del programa, y luego poder hacer aserciones sobre esa salida.
-        // Configuramos el comportamiento del mock:
-        // "Cuando llamen a Sumar con cualquier int, devuelve 33"
-        mockMatematica.Setup(m => m.Sumar(It.IsAny<int>(), It.IsAny<int>())).Returns(33);
-        // "Cuando llamen a Restar con cualquier int, devuelve 11"
-        mockMatematica.Setup(m => m.Restar(It.IsAny<int>(), It.IsAny<int>())).Returns(11);
-
-        // Hago que el STDOut sea un StringWriter, para capturar la salida del programa.
-        using var sw = new StringWriter();
-        Console.SetOut(sw);
-        // Para mandarle números al programa, hago que el STDIN sea un StringReader, y le paso los números que quiero que el programa lea, separados por un salto de línea.
-        using var sr = new StringReader("50\n70\n");
-        Console.SetIn(sr);
-
-        //Assert.Pass(); // La prueba pasa sin problemas.
-        // DADO: GIVEN: CONTEXTO: En qué condiciones se va a ejecutar la función de prueba.
-        // ACCION: WHEN: CUANDO: Qué función se va a ejecutar en la función de prueba.
-        logicaDelProgramaAislada.ejecutar();
-        // COMPROBACION: THEN: ENTONCES: Qué resultado se espera de la función de prueba.
-        var resultado = sw.ToString().Trim();
-        // Asegurate que contiene el mensaje de bienvenida, el mensaje de despedida, y el mensaje de error por no ingresar números válidos.
-        Assert.Contains("Hello, cuentecitas!", resultado);
-        Assert.Contains("¡Hasta luego, cuentecitas!", resultado);
-        Assert.Contains("Ingrese el primer número:", resultado);
-        Assert.Contains("Ingrese el segundo número:", resultado);
-        Assert.Contains("La suma de 50 y 70 es: 33", resultado);
-        Assert.Contains("La resta de 50 y 70 es: 11", resultado);
-        // ME aseguro que el mock se haya llamado con los números que le pasé al programa.
-        mockMatematica.Verify(m => m.Sumar(50, 70), Times.Once);
-        mockMatematica.Verify(m => m.Restar(50, 70), Times.Once);
-    }
-    // Prueba unitaria.
-}
-
-/*
-
-        // Pedido al usuario 2 númemros:
-        Console.WriteLine("Ingrese el primer número:");
-        string input1 = Console.ReadLine();
-        Console.WriteLine("Ingrese el segundo número:");
-        string input2 = Console.ReadLine();
-
-        // Verifico que son números y los convierto a enteros:
-        if (!int.TryParse(input1, out int numero1) || !int.TryParse(input2, out int numero2))
+        try
         {
-            Console.WriteLine("Por favor, ingrese números válidos.");
-            return;
-        } else
-        {
-            // Realizo la suma:
-            int resultado = matematica.Sumar(numero1, numero2);
+            Console.SetIn(input);
+            Console.SetOut(output);
 
-            // Muestro el resultado:
-            Console.WriteLine($"La suma de {numero1} y {numero2} es: {resultado}");
+            sut.ejecutar();
 
-            // Realizo la resta:
-            int resultadoResta = matematica.Restar(numero1, numero2);
-
-            // Muestro el resultado de la resta:
-            Console.WriteLine($"La resta de {numero1} y {numero2} es: {resultadoResta}");
+            string resultado = output.ToString();
+            Assert.Contains("Hello, cuentecitas!", resultado);
+            Assert.Contains("Ingrese el primer número:", resultado);
+            Assert.Contains("Ingrese el segundo número:", resultado);
+            Assert.Contains("La suma de 5 y 10 es: 15", resultado);
+            Assert.Contains("La resta de 5 y 10 es: -5", resultado);
+            Assert.Contains("¡Hasta luego, cuentecitas!", resultado);
         }
+        finally
+        {
+            Console.SetIn(originalIn);
+            Console.SetOut(originalOut);
+        }
+    }
 
-        // Chao pescao!*/
+    [Fact]
+    public void Ejecutar_con_dependencia_mockeada_usa_la_libreria_inyectada()
+    {
+        var mockMatematica = new Mock<ILibreriaMatematica>();
+        mockMatematica.Setup(m => m.Sumar(50, 70)).Returns(33);
+        mockMatematica.Setup(m => m.Restar(50, 70)).Returns(11);
+
+        var sut = CrearSut(mockMatematica.Object, out _);
+
+        TextReader originalIn = Console.In;
+        TextWriter originalOut = Console.Out;
+        using var input = new StringReader("50" + Environment.NewLine + "70" + Environment.NewLine);
+        using var output = new StringWriter();
+
+        try
+        {
+            Console.SetIn(input);
+            Console.SetOut(output);
+
+            sut.ejecutar();
+
+            string resultado = output.ToString();
+            Assert.Contains("La suma de 50 y 70 es: 33", resultado);
+            Assert.Contains("La resta de 50 y 70 es: 11", resultado);
+            mockMatematica.Verify(m => m.Sumar(50, 70), Times.Once);
+            mockMatematica.Verify(m => m.Restar(50, 70), Times.Once);
+        }
+        finally
+        {
+            Console.SetIn(originalIn);
+            Console.SetOut(originalOut);
+        }
+    }
+
+    [Fact]
+    public void Ejecutar_con_primer_numero_invalido_muestra_error_y_no_hace_operaciones()
+    {
+        var mockMatematica = new Mock<ILibreriaMatematica>(MockBehavior.Strict);
+        var sut = CrearSut(mockMatematica.Object, out _);
+
+        TextReader originalIn = Console.In;
+        TextWriter originalOut = Console.Out;
+        using var input = new StringReader("abc" + Environment.NewLine + "10" + Environment.NewLine);
+        using var output = new StringWriter();
+
+        try
+        {
+            Console.SetIn(input);
+            Console.SetOut(output);
+
+            sut.ejecutar();
+
+            string resultado = output.ToString();
+            Assert.Contains("Por favor, ingrese números válidos.", resultado);
+            Assert.DoesNotContain("¡Hasta luego, cuentecitas!", resultado);
+            mockMatematica.Verify(m => m.Sumar(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+            mockMatematica.Verify(m => m.Restar(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+        }
+        finally
+        {
+            Console.SetIn(originalIn);
+            Console.SetOut(originalOut);
+        }
+    }
+
+    [Fact]
+    public void Ejecutar_con_segundo_numero_invalido_muestra_error_y_no_hace_operaciones()
+    {
+        var mockMatematica = new Mock<ILibreriaMatematica>(MockBehavior.Strict);
+        var sut = CrearSut(mockMatematica.Object, out _);
+
+        TextReader originalIn = Console.In;
+        TextWriter originalOut = Console.Out;
+        using var input = new StringReader("5" + Environment.NewLine + "xyz" + Environment.NewLine);
+        using var output = new StringWriter();
+
+        try
+        {
+            Console.SetIn(input);
+            Console.SetOut(output);
+
+            sut.ejecutar();
+
+            string resultado = output.ToString();
+            Assert.Contains("Por favor, ingrese números válidos.", resultado);
+            Assert.DoesNotContain("¡Hasta luego, cuentecitas!", resultado);
+            mockMatematica.Verify(m => m.Sumar(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+            mockMatematica.Verify(m => m.Restar(It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+        }
+        finally
+        {
+            Console.SetIn(originalIn);
+            Console.SetOut(originalOut);
+        }
+    }
+
+    [Fact]
+    public async Task StartAsync_ejecuta_la_logica_y_detiene_la_aplicacion()
+    {
+        var mockMatematica = new Mock<ILibreriaMatematica>();
+        mockMatematica.Setup(m => m.Sumar(8, 2)).Returns(10);
+        mockMatematica.Setup(m => m.Restar(8, 2)).Returns(6);
+
+        var sut = CrearSut(mockMatematica.Object, out var mockLifetime);
+
+        TextReader originalIn = Console.In;
+        TextWriter originalOut = Console.Out;
+        using var input = new StringReader("8" + Environment.NewLine + "2" + Environment.NewLine);
+        using var output = new StringWriter();
+
+        try
+        {
+            Console.SetIn(input);
+            Console.SetOut(output);
+
+            await sut.StartAsync(CancellationToken.None);
+
+            string resultado = output.ToString();
+            Assert.Contains("La suma de 8 y 2 es: 10", resultado);
+            Assert.Contains("La resta de 8 y 2 es: 6", resultado);
+            mockMatematica.Verify(m => m.Sumar(8, 2), Times.Once);
+            mockMatematica.Verify(m => m.Restar(8, 2), Times.Once);
+            mockLifetime.Verify(l => l.StopApplication(), Times.Once);
+        }
+        finally
+        {
+            Console.SetIn(originalIn);
+            Console.SetOut(originalOut);
+        }
+    }
+
+    [Fact]
+    public async Task StopAsync_completa_correctamente()
+    {
+        var sut = CrearSut(new global::LibreriaMatematica.LibreriaMatematica(), out _);
+
+        Task resultado = sut.StopAsync(CancellationToken.None);
+        await resultado;
+
+        Assert.True(resultado.IsCompletedSuccessfully);
+    }
+
+    private static LogicaDelPrograma CrearSut(ILibreriaMatematica matematica, out Mock<IHostApplicationLifetime> mockLifetime)
+    {
+        mockLifetime = new Mock<IHostApplicationLifetime>();
+        return new LogicaDelPrograma(matematica, mockLifetime.Object);
+    }
+}
